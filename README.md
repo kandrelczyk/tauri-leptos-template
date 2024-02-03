@@ -1,12 +1,13 @@
 # Tauri + Leptos
 
-This template should help get you started developing with Tauri and Leptos.
+This template should help get you started developing with Tauri and Leptos. 
 
 It has examples of:
 
-* command returning `Result` that can be used with create_resource, Suspense and ErrorBoundary.
+* command returning `Result` that can be used with `create_resource`, `Suspense` and `ErrorBoundary`.
 * command accepting no arguments
 * sending events to the front-end
+* Tailwind CSS integration
 
 ### Android build
 
