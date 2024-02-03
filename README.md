@@ -2,6 +2,12 @@
 
 This template should help get you started developing with Tauri and Leptos.
 
+It has examples of:
+
+* command returning `Result` that can be used with create_resource, Suspense and ErrorBoundary.
+* command accepting no arguments
+* sending events to the front-end
+
 ### Android build
 
 To build the app for Android on Linux insert those exports into .bashrc:
@@ -26,3 +32,6 @@ export STRIP=$TOOLCHAIN/bin/llvm-strip
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
 export PATH=$PATH:$TOOLCHAIN/bin
 ```
+
+
+Run `cargo tauri android init` and `cargo tauri android dev`
