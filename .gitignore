@@ -1,5 +1,6 @@
 target/
 dist/
+style/
 src-tauri/gen/
 src-tauri/capabilities/
 src-tauri/.cargo
