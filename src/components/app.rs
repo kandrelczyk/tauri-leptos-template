@@ -30,8 +30,8 @@ pub fn App() -> impl IntoView {
     let resource = create_resource(error, move |e| async move { 
         let args = to_value(&Args{error: e}).unwrap();
         match invoke("command", args).await {
-            Ok(result) => Ok(from_value::<String>(result).expect("To parse config")),
-            Err(error) => Err(from_value::<CustomError>(error).expect("To parse AlarmError"))
+            Ok(result) => Ok(from_value::<String>(result).expect("To parse String")),
+            Err(error) => Err(from_value::<CustomError>(error).expect("To parse CustomError"))
         }
     });
     
