@@ -2,15 +2,23 @@
 
 This template should help get you started developing with Tauri and Leptos.
 
+It uses Tauri 2.0beta and Leptos 0.6.
+
 It has examples of:
 
 * command returning `Result` that can be used with create_resource, Suspense and ErrorBoundary.
 * command accepting no arguments
 * sending events to the front-end
+* tailwind CSS integration
+* logging on both front-end and back-end
 
-### Android build
+### Desktop app
 
-To build the app for Android on Linux insert those exports into .bashrc:
+Run `cargo tauri dev`
+
+### Android app
+
+To build the app for Android on Linux insert following into .bashrc:
 
 ```
 export JAVA_HOME={java home}

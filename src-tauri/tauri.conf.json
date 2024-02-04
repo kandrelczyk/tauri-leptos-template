@@ -1,50 +1,42 @@
 {
-  "build": {
-    "beforeBuildCommand": "trunk build",
-    "beforeDevCommand": "trunk serve",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist",
-    "withGlobalTauri": true
-  },
-  "package": {
     "productName": "TauriLeptosTemplate",
-    "version": "0.0.0"
-  },
-  "plugins": {
-    "shell": {
-      "open": true
+    "identifier": "net.curiana",
+    "version": "0.0.0",
+    "build": {
+        "beforeBuildCommand": "trunk build",
+        "beforeDevCommand": "trunk serve",
+        "devUrl": "http://localhost:1420",
+        "frontendDist": "../dist"
     },
-    "updater": {
-      "endpoints": []
-    }
-  },
-  "tauri": {
+    "plugins": {
+        "shell": {
+            "open": true
+        }
+    },
     "bundle": {
-      "active": true,
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "net.curiana",
-      "targets": "all",
-      "updater": {
-        "active": false
-      }
+        "active": true,
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "targets": "all"
     },
-    "security": {
-      "csp": null
-    },
-    "windows": [
-      {
-        "fullscreen": false,
-        "height": 460,
-        "resizable": true,
-        "title": "TauriLeptos",
-        "width": 300
-      }
-    ]
-  }
+    "app": {
+        "withGlobalTauri": true,
+        "security": {
+            "csp": null
+        },
+        "windows": [
+            {
+                "fullscreen": false,
+                "height": 460,
+                "resizable": true,
+                "title": "TauriLeptos",
+                "width": 300
+            }
+        ]
+    }
 }
