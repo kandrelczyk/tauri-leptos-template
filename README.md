@@ -11,8 +11,12 @@ It has examples of:
 * sending events to the front-end
 * logging on both front-end and back-end
 * Tailwind CSS integration
+* Tray Icon
+
 
 ### Desktop app
+
+Make sure you have trau-cli updated to the latestes version.
 
 Run `cargo tauri dev`
 
