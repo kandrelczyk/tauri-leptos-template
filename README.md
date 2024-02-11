@@ -16,7 +16,7 @@ It has examples of:
 
 ### Desktop app
 
-Make sure you have trau-cli updated to the latestes version.
+Make sure you have tauri-cli updated to the latestes version.
 
 Run `cargo tauri dev`
 
