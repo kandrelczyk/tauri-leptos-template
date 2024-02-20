@@ -9,7 +9,7 @@ pub async fn command(error: bool) -> Result<String, CustomError> {
     if !error {
         Ok("Ok Response".to_owned())
     } else {
-        Err(CustomError{ reason: "Error Reponse".to_owned()})
+        Err(CustomError{ reason: "Error Response".to_owned()})
     }
 }
 

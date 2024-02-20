@@ -12,7 +12,7 @@ It has examples of:
 * logging on both front-end and back-end
 * Tailwind CSS integration
 * Tray Icon
-
+* Itegration test using tauri-driver
 
 ### Desktop app
 
@@ -47,3 +47,7 @@ export PATH=$PATH:$TOOLCHAIN/bin
 
 
 Run `cargo tauri android init` and `cargo tauri android dev`
+
+### Integration tests
+
+Install tauri-driver and WebKitWebDriver (https://tauri.app/v1/guides/testing/webdriver/introduction). Build the app using `cargo tauri build`. Run the test using `cargo test`. 
