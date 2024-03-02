@@ -19,7 +19,7 @@ async fn test_results() -> WebDriverResult<()> {
     let tauri_driver = std::process::Command::new("tauri-driver").spawn().expect("Failed to start tauri-driver");
     std::thread::sleep(std::time::Duration::from_secs(1));
     let mut caps = Capabilities::new();
-    caps.add("tauri:options", json!({ "application": "./target/x86_64-unknown-linux-gnu/debug/tauri-leptos-template" }))?;
+    caps.add("tauri:options", json!({ "application": "./target/x86_64-unknown-linux-gnu/release/tauri-leptos-template" }))?;
     caps.add("browserName", "wry")?;
 
     let driver = WebDriver::new("http://localhost:4444", caps).await?;
