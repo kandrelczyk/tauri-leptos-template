@@ -14,7 +14,15 @@ It has examples of:
 * Tray Icon
 * Itegration test using tauri-driver
 
+### Setup
+
+Follow the typical Tauri setup process for your platform. Install all dependencies listed in prerequisites.
+
+Install trunk and tailwindcss (`npm install -g tailwindcss`).
+
+
 ### Desktop app
+
 
 Make sure you have tauri-cli updated to the latestes version.
 
