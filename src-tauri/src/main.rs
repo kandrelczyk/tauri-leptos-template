@@ -30,7 +30,7 @@ fn main() {
             let handle = app.handle();
             let menu = get_maximized_menu(handle);
             let _tray = tauri::tray::TrayIconBuilder::with_id("tray_1")
-                .icon(tauri::Icon::File("icons/icon_none.png".into()))
+                .icon(tauri::image::Image::from_bytes(include_bytes!("../icons/32x32.png"))?)
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id().as_ref() {
                     "show" => {
@@ -38,7 +38,7 @@ fn main() {
                             .unwrap()
                             .show()
                             .expect("To show the window");
-                        app.tray()
+                        app.tray_by_id("main")
                             .unwrap()
                             .set_menu(Some(get_maximized_menu(app)))
                             .unwrap();
@@ -59,7 +59,7 @@ fn main() {
             ..
         } = event
         {
-            app.tray()
+            app.tray_by_id("main")
                 .unwrap()
                 .set_menu(Some(get_minimized_menu(app)))
                 .unwrap();
