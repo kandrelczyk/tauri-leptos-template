@@ -59,8 +59,12 @@ Run `cargo tauri android init` and `cargo tauri android dev`
 ### Building apk file
 
 Follow instructions at https://next--tauri.netlify.app/next/guides/distribution/sign-android/
-You can use local.properties and build.gradle.kts template files in the repo.
+You can use the included local.properties and build.gradle.kts template files.
 
 ### Integration tests
 
 Install tauri-driver and WebKitWebDriver (https://tauri.app/v1/guides/testing/webdriver/introduction). Build the app using `cargo tauri build`. Run the test using `cargo test`. 
+
+### Android Auto support
+
+Work in progress

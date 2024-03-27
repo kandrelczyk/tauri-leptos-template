@@ -3,7 +3,7 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.android") 
     id("rust")
 }
 val localPropertiesFile = rootProject.file("app/local.properties")
@@ -67,6 +67,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.4")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
+    implementation("androidx.car.app:app:1.2.0")
 }
 
+repositories {
+    mavenCentral()
+}
 apply(from = "tauri.build.gradle.kts")
