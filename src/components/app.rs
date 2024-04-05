@@ -1,6 +1,6 @@
 use leptos::*;
-use serde_wasm_bindgen::{to_value, from_value};
 use serde::{Deserialize, Serialize};
+use serde_wasm_bindgen::{from_value, to_value};
 use wasm_bindgen::prelude::*;
 
 use template_common::CustomError;
@@ -24,27 +24,32 @@ struct Args {
 
 #[component]
 pub fn App() -> impl IntoView {
-
     let (error, set_error) = create_signal(false);
 
-    let resource = create_resource(error, move |e| async move { 
-        let args = to_value(&Args{error: e}).unwrap();
+    let resource = create_resource(error, move |e| async move {
+        let args = to_value(&Args { error: e }).unwrap();
         match invoke("command", args).await {
             Ok(result) => Ok(from_value::<String>(result).expect("To parse String")),
-            Err(error) => Err(from_value::<CustomError>(error).expect("To parse CustomError"))
+            Err(error) => Err(from_value::<CustomError>(error).expect("To parse CustomError")),
         }
     });
-    
-    create_local_resource(|| (), move |_| async move {
-        invoke("start_events", JsValue::NULL).await.expect("To schedule events");
 
-        let cb = Closure::<dyn Fn(JsValue)>::new(move |_| { 
-            log::info!("Received event"); // will appear in console
-        });
-        listen("custom_event", &cb).await.expect("To create listener");
-        cb.forget();
-    });
+    create_local_resource(
+        || (),
+        move |_| async move {
+            invoke("start_events", JsValue::NULL)
+                .await
+                .expect("To schedule events");
 
+            let cb = Closure::<dyn Fn(JsValue)>::new(move |_| {
+                log::info!("Received event"); // will appear in console
+            });
+            listen("custom_event", &cb)
+                .await
+                .expect("To create listener");
+            cb.forget();
+        },
+    );
 
     view! {
         <main class="p-4">
@@ -70,7 +75,7 @@ pub fn App() -> impl IntoView {
                             }>
 
                                 {move || {
-                                   resource 
+                                   resource
                                         .and_then(|response| { view!{ <p>{response}</p>}})
                                     }
                                 }

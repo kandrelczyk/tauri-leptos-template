@@ -1,11 +1,10 @@
-use std::fmt;
-use std::error::Error;
 use serde::{Deserialize, Serialize};
-
+use std::error::Error;
+use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CustomError {
-    pub reason: String
+    pub reason: String,
 }
 
 impl fmt::Display for CustomError {

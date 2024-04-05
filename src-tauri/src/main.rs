@@ -30,7 +30,9 @@ fn main() {
             let handle = app.handle();
             let menu = get_maximized_menu(handle);
             let _tray = tauri::tray::TrayIconBuilder::with_id("tray_1")
-                .icon(tauri::image::Image::from_bytes(include_bytes!("../icons/32x32.png"))?)
+                .icon(tauri::image::Image::from_bytes(include_bytes!(
+                    "../icons/32x32.png"
+                ))?)
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id().as_ref() {
                     "show" => {
@@ -71,5 +73,3 @@ fn main() {
         }
     });
 }
-
-

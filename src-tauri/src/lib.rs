@@ -54,8 +54,6 @@ impl AppBuilder {
             .build(tauri::generate_context!())
             .expect("To build tauri app");
 
-            app
+        app
     }
 }
-
-
