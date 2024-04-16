@@ -15,6 +15,12 @@ then
     exit 1
 fi
 
+if ! cargo tauri build
+then
+    echo "There are some build issues."
+    exit 1
+fi
+
 if ! cargo test
 then
     echo "There are some test issues."
