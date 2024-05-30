@@ -7,7 +7,7 @@ fn cleanup() {
     system.refresh_all();
     for p in system.processes_by_name("tauri") {
         if let Some(exe) = p.exe() {
-            if exe.to_str().unwrap().contains("tauri-leptos-template") {
+            if exe.to_str().unwrap().contains("tauri-leptos") {
                 p.kill();
             }
         }
@@ -23,7 +23,7 @@ async fn test_results() -> WebDriverResult<()> {
     let mut caps = Capabilities::new();
     caps.add(
         "tauri:options",
-        json!({ "application": "./target/x86_64-unknown-linux-gnu/release/tauri-leptos-template" }),
+        json!({ "application": "./target/x86_64-unknown-linux-gnu/release/tauri-leptos" }),
     )?;
     caps.add("browserName", "wry")?;
 
