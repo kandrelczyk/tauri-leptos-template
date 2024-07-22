@@ -40,7 +40,7 @@ fn main() {
                             .unwrap()
                             .show()
                             .expect("To show the window");
-                        app.tray_by_id("main")
+                        app.tray_by_id("tray_1")
                             .unwrap()
                             .set_menu(Some(get_maximized_menu(app)))
                             .unwrap();
@@ -61,11 +61,11 @@ fn main() {
             ..
         } = event
         {
-            app.tray_by_id("main")
+            api.prevent_close();
+            app.tray_by_id("tray_1")
                 .unwrap()
                 .set_menu(Some(get_minimized_menu(app)))
                 .unwrap();
-            api.prevent_close();
             app.get_window("main")
                 .unwrap()
                 .hide()

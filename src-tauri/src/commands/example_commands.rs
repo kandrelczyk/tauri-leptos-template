@@ -1,5 +1,5 @@
 use std::sync::OnceLock;
-use tauri::Manager; // brings app.emit() into scope
+use tauri::Emitter; // brings app.emit() into scope
 use template_common::CustomError;
 
 #[tauri::command]
