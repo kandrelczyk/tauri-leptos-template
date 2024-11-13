@@ -25,7 +25,12 @@ rustup toolchain install nightly
 rustup default nightly
 ```
 
-Install trunk and tailwindcss (`npm install -g tailwindcss`).
+Install trunk and tailwindcss:
+
+```
+npm install -g tailwindcss
+cargo install trunk
+```
 
 
 ### Desktop app
