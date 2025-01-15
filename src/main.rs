@@ -1,7 +1,7 @@
 mod components;
 
 use components::App;
-use leptos::*;
+use leptos::prelude::*;
 
 fn main() {
     console_error_panic_hook::set_once();
