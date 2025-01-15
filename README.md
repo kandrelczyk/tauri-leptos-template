@@ -17,8 +17,20 @@ It has examples of:
 ### Setup
 
 Follow the typical Tauri setup process for your platform. Install all dependencies listed in prerequisites.
+Tauri setup is described here: https://v2.tauri.app/start/prerequisites/
+Leptos requires nightly rust. Install it by executing:
 
-Install trunk and tailwindcss (`npm install -g tailwindcss`).
+```
+rustup toolchain install nightly
+rustup default nightly
+```
+
+Install trunk and tailwindcss:
+
+```
+npm install -g tailwindcss
+cargo install trunk
+```
 
 
 ### Desktop app
