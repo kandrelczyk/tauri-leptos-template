@@ -15,10 +15,12 @@ fn cleanup() {
 }
 
 #[tokio::test]
+#[allow(clippy::zombie_processes)]
 async fn test_results() -> WebDriverResult<()> {
     let tauri_driver = std::process::Command::new("tauri-driver")
         .spawn()
         .expect("Failed to start tauri-driver");
+
     std::thread::sleep(std::time::Duration::from_secs(1));
     let mut caps = DesiredCapabilities::chrome();
     caps.insert_base_capability(
