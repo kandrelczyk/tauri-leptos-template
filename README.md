@@ -28,7 +28,7 @@ rustup default nightly
 Install trunk and tailwindcss:
 
 ```
-npm install -g tailwindcss
+npm install -D tailwindcss@3 -g
 cargo install trunk
 ```
 
