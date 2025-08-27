@@ -1,0 +1,298 @@
+name: "Build & Publish App"
+on:
+  push:
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  create-release:
+    name: Create a new github Android release
+
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      upload_url: ${{ steps.get-u-url.outputs.result }}
+      release_id: ${{ steps.get-id.outputs.result }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create-release
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ github.ref_name }}
+        with:
+          script: |
+            const fs = require("fs");
+            const version = require('./src-tauri/tauri.conf.json').version;
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: version,
+              name: `Twili Recipes v${version}`,
+              body: String(fs.readFileSync("./latest.md")),
+              draft: true,
+            });
+            return data
+            
+      - name: Get Release Id
+        id: get-id
+        uses: actions/github-script@v7
+        env:
+          data: ${{ steps.create-release.outputs.result }}
+        with:
+          result-encoding: string
+          script: |
+            let data = process.env.data;
+
+            try {
+              data = JSON.parse(data);
+
+              console.log(data.id);
+
+              return data.id;
+            } catch (_) {
+              console.log(data.id);
+              return data.id;
+            }
+
+      - name: Get Upload Url
+        id: get-u-url
+        uses: actions/github-script@v7
+        env:
+          data: ${{ steps.create-release.outputs.result }}
+        with:
+          result-encoding: string
+          script: |
+            let data = process.env.data;
+
+            try {
+              data = JSON.parse(data);
+
+              return data.upload_url;
+            } catch (_) {
+              return data.upload_url;
+            }
+
+  publish-desktop:
+    needs: create-release
+    name: Buld & Publish Tauri Desktop App
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+        # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
+        # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
+
+          
+      - name: install frontend dependencies
+        run: |
+          cargo install --path .
+          cargo install tauri-cli --version "^2.0.0" --locked
+          cargo install trunk
+          npm install -g tailwindcss@3.4.17
+          rustup target add wasm32-unknown-unknown
+          
+      - uses: kandrelczyk/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{secrets.TAURI_SIGNING_PRIVATE_KEY}}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD}}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          args: ${{ matrix.args }}
+          releaseDraft: true
+          tauriScript: cargo tauri
+
+          
+  publish-android:
+    needs: create-release
+    name: Buld & Publish Tauri Android App
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          key: build_apk
+          save-always: true
+          path: |
+            sdk
+            target
+
+      - name: Get Version
+        id: get_version
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ github.ref_name }}
+        with:
+          script: |
+            const version = require('./src-tauri/tauri.conf.json').version;
+            console.log(version)
+            return version
+          result-encoding: string
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Download & Install Android Build Things
+        run: |
+          echo y | sdkmanager "platform-tools"
+          echo y | sdkmanager "platforms;android-34"
+          echo y | sdkmanager "ndk;27.0.12077973"
+          echo y | sdkmanager "build-tools;35.0.0-rc4"
+
+      - name: Install Tauri Requirements
+        run: |
+          sudo apt update
+          sudo apt install libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Install Rust Nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install Rust Targets
+        run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android wasm32-unknown-unknown
+
+      - name: Build Tauri App (Android)
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.12077973
+          TAURI_SIGNING_PRIVATE_KEY: ${{secrets.TAURI_SIGNING_PRIVATE_KEY}}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD}}
+        run: |
+          export TOOLCHAIN=$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
+          export TARGET=aarch64-linux-android
+          export API=33
+          
+          export AR=$TOOLCHAIN/bin/llvm-ar
+          export CC=$TOOLCHAIN/bin/$TARGET$API-clang
+          export AS=$CC
+          export CXX=$TOOLCHAIN/bin/$TARGET$API-clang++
+          export LD=$TOOLCHAIN/bin/ld
+          export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+          export STRIP=$TOOLCHAIN/bin/llvm-strip
+          
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+          export PATH=$PATH:$TOOLCHAIN/bin
+
+          echo '[target.aarch64-linux-android]' >  $HOME/.cargo/config.toml
+          echo "linker = \"$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android33-clang\"" >> $HOME/.cargo/config.toml
+
+          sudo chmod 777 -R ./src-tauri
+          cargo install --path .
+          cargo install tauri-cli --version "^2.0.0" --locked
+          cargo install trunk
+          npm install -g tailwindcss@3.4.17 
+          cargo tauri android init
+          cargo tauri icon icon.png
+          ./copy-android.sh
+          cargo tauri android build
+
+      - uses: r0adkll/sign-android-release@v1
+        name: Sign app APK
+        id: sign_app
+        with:
+          releaseDirectory: /home/runner/work/twili-recipes/twili-recipes/src-tauri/gen/android/app/build/outputs/apk/universal/release/
+          signingKeyBase64: ${{ secrets.KEY_FILE }}
+          alias: app
+          keyStorePassword: ${{ secrets.K_PASSWORD }}
+          keyPassword: ${{ secrets.K_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: 35.0.0-rc4
+
+      - name: As Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: /home/runner/work/android-client/android-client/src-tauri/gen/android/app/build/outputs/apk/universal/release/*
+          name: universal_apk
+
+      - name: Upload to Release
+        uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          asset_name: TwiliRecipes-${{ steps.get_version.outputs.result }}.apk
+          asset_content_type: application/octet-stream
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  
+
+  undraft-release:
+    needs: [create-release, publish-android, publish-desktop]
+    name: Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Undraft Release
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ github.ref_name }}
+          R_ID: ${{ needs.create-release.outputs.release_id }}
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.R_ID,
+              draft: false
+            });
+

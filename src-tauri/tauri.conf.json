@@ -22,7 +22,7 @@
             "icons/icon.icns",
             "icons/icon.ico"
         ],
-        "targets": "all"
+        "targets": ["deb","rpm"]
     },
     "app": {
         "withGlobalTauri": true,
