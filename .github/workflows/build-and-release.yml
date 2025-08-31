@@ -130,7 +130,7 @@ jobs:
           npm install -g tailwindcss@3.4.17
           rustup target add wasm32-unknown-unknown
           
-      - uses: kandrelczyk/tauri-action@latest-json-with-new-targetsv2
+      - uses: kandrelczyk/tauri-action@feature/bundle-types
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{secrets.TAURI_SIGNING_PRIVATE_KEY}}

@@ -1,7 +1,7 @@
 {
     "productName": "TauriLeptosTemplate",
     "identifier": "net.curiana",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "build": {
         "beforeBuildCommand": "trunk build",
         "beforeDevCommand": "trunk serve",

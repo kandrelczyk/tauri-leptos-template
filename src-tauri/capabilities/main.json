@@ -4,6 +4,7 @@
   "description": "permissions to run the app",
   "windows": ["main", "main-*"],
   "permissions": [
+    "updater:default",
     "core:default",
     "core:app:default",
     "core:path:default",
