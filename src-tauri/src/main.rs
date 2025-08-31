@@ -4,6 +4,7 @@ use tauri::{
     menu::{Menu, MenuItem},
     AppHandle, Manager,
 };
+use tauri_plugin_updater::UpdaterExt;
 
 fn get_maximized_menu(app: &AppHandle) -> Menu<tauri::Wry> {
     Menu::with_items(
@@ -24,10 +25,38 @@ fn get_minimized_menu(app: &AppHandle) -> Menu<tauri::Wry> {
     .unwrap()
 }
 
+async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
+    if let Some(update) = app.updater()?.check().await? {
+        let mut downloaded = 0;
+
+        // alternatively we could also call update.download() and update.install() separately
+        update
+            .download_and_install(
+                |chunk_length, content_length| {
+                    downloaded += chunk_length;
+                    println!("downloaded {downloaded} from {content_length:?}");
+                },
+                || {
+                    println!("download finished");
+                },
+            )
+            .await?;
+
+        println!("update installed");
+        app.restart();
+    }
+
+    Ok(())
+}
+
 fn main() {
     let app = app_lib::AppBuilder::new()
         .setup(move |app| {
             let handle = app.handle();
+            let update_handle = handle.clone();
+            tauri::async_runtime::spawn(async move {
+                update(update_handle).await.unwrap();
+            });
             let menu = get_maximized_menu(handle);
             let _tray = tauri::tray::TrayIconBuilder::with_id("tray_1")
                 .icon(tauri::image::Image::from_bytes(include_bytes!(
